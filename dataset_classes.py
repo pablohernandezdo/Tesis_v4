@@ -198,6 +198,7 @@ class DatasetBelgica(Dsets):
                 cft = classic_sta_lta(tr, sta_n, lta_n)
 
                 if np.amax(cft) < 2:
+                    copied += 1
                     self.noise_traces.append(tr)
 
                 if copied == self.n_traces:

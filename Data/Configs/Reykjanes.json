@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "Reykjanes": {
+      "path": "Data/Preprocessed/Reykjanes.npy",
+            "type": "seismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/DAS/Reykjanes.hdf5"
+}

@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "NCAirgun": {
+      "path": "Data/Preprocessed/NCAirgun.npy",
+            "type": "nonseismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/NCAirgun/NCAirgun.hdf5"
+}

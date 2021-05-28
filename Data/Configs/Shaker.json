@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "Shaker": {
+      "path": "Data/Preprocessed/Shaker.npy",
+            "type": "nonseismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/DAS/Shaker.hdf5"
+}

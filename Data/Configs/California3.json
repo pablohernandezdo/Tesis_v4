@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "California3": {
+      "path": "Data/Preprocessed/California3.npy",
+            "type": "nonseismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/DAS/California3.hdf5"
+}

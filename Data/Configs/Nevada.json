@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "Nevada": {
+      "path": "Data/Preprocessed/Nevada.npy",
+            "type": "seismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/DAS/Nevada.hdf5"
+}

@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "Hydraulic": {
+      "path": "Data/Preprocessed/Hydraulic.npy",
+            "type": "nonseismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/DAS/Hydraulic.hdf5"
+}

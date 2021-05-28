@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "Vibroseis1": {
+      "path": "Data/Preprocessed/Vibroseis1.npy",
+            "type": "nonseismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/DAS/Vibroseis1.hdf5"
+}

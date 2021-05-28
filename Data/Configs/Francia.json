@@ -1,0 +1,10 @@
+{
+  "Datasets": {
+    "Francia": {
+      "path": "Data/Preprocessed/Francia.npy",
+            "type": "seismic",
+            "format": "npy"
+    }
+  },
+  "OutputFile": "Data/HDF5/DAS/Francia.hdf5"
+}

@@ -175,7 +175,7 @@ class DatasetBelgica(Dsets):
         print(f"Reading dataset from path: {self.dataset_path}")
         self.traces = sio.loadmat(self.dataset_path)["Data_2D"]
 
-        self.noise_traces = np.empty((0, 6000))
+        self.noise_traces = []
 
         # ventanas en tiempo
         sta_t = 3
@@ -198,14 +198,15 @@ class DatasetBelgica(Dsets):
                 cft = classic_sta_lta(tr, sta_n, lta_n)
 
                 if np.amax(cft) < 2:
-                    self.noise_traces = np.vstack([self.noise_traces, tr])
-                    copied += 1
+                    self.noise_traces.append(tr)
 
                 if copied == self.n_traces:
                     break
 
             if copied == self.n_traces:
                 break
+
+        self.noise_traces = np.asarray(self.noise_traces)
 
         print(f"Saving npy format dataset in {self.savepath}")
         self.save_dataset(self.noise_traces, self.savepath, 'Belgica')

@@ -203,9 +203,6 @@ class DatasetBelgica(Dsets):
                     self.noise_traces = np.vstack([self.noise_traces, tr])
                     copied += 1
 
-                if not (copied % 100):
-                    print(f"copied: {copied}")
-
                 if copied == self.n_traces:
                     break
 

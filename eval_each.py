@@ -10,7 +10,6 @@ from torch.utils.data import DataLoader
 from humanfriendly import format_timespan
 
 from models import *
-from model_cnn import *
 
 
 def main():

@@ -106,8 +106,7 @@ class DatasetFrancia(Dsets):
         self.traces = self.normalize(self.traces)
 
         print(f"Saving npy format dataset in {self.savepath}")
-        if not os.path.exists(f'{self.savepath}/Francia.npy'):
-            self.save_dataset(self.traces, self.savepath, 'Francia')
+        self.save_dataset(self.traces, self.savepath, 'Francia')
 
     def prune_traces(self):
         pass
@@ -138,8 +137,7 @@ class DatasetNevada(Dsets):
         self.traces = self.normalize(self.traces)
 
         print(f"Saving npy format dataset in {self.savepath}")
-        if not os.path.exists(f'{self.savepath}/Nevada.npy'):
-            self.save_dataset(self.traces, self.savepath, 'Nevada')
+        self.save_dataset(self.traces, self.savepath, 'Nevada')
 
     def padd(self):
 
@@ -210,8 +208,7 @@ class DatasetBelgica(Dsets):
                 break
 
         print(f"Saving npy format dataset in {self.savepath}")
-        if not os.path.exists(f'{self.savepath}/Belgica.npy'):
-            self.save_dataset(self.noise_traces, self.savepath, 'Belgica')
+        self.save_dataset(self.noise_traces, self.savepath, 'Belgica')
 
 
 class DatasetReykjanes(Dsets):

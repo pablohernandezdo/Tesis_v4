@@ -22,9 +22,6 @@ class Dsets:
 
         for trace in traces:
 
-            if np.sum(np.abs(trace)) == 0:
-                continue
-
             if fs / 2 < 50:
                 # Filter 50 Hz
                 trace = self.butter_lowpass_filter(trace, 50, fs)
@@ -105,11 +102,26 @@ class DatasetFrancia(Dsets):
         print("Normalizing dataset")
         self.traces = self.normalize(self.traces)
 
-        print(f"Saving npy format dataset in {self.savepath}")
+        print(f"Saving npy format dataset with zeros in {self.savepath}")
         self.save_dataset(self.traces, self.savepath, 'Francia')
 
-    def prune_traces(self):
-        pass
+        print(f"Eliminating zero traces")
+        self.traces_nonzero = self.elim_zeros()
+
+        print(f"Saving npy format dataset without zeros in {self.savepath}")
+        self.save_dataset(self.traces_nonzero, self.savepath, 'Francia_no_zeros')
+
+    def elim_zeros(self):
+        new_traces = []
+
+        for trace in self.traces:
+
+            if np.sum(np.abs(trace)) == 0:
+                continue
+
+            new_traces.append(trace)
+
+        return np.asarray(new_traces)
 
 
 class DatasetNevada(Dsets):

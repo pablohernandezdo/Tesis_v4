@@ -15,6 +15,9 @@ from scipy.signal import butter, lfilter, detrend
 
 
 class Dsets:
+    def __init__(self):
+        pass
+
     def preprocess(self, traces, fs):
 
         new_traces = []

@@ -2,46 +2,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class ANN2(nn.Module):
-    def __init__(self):
-        super(ANN2, self).__init__()
-
-        self.l1 = nn.Linear(6000, 3000)
-        self.l2 = nn.Linear(3000, 2000)
-        self.l3 = nn.Linear(2000, 1000)
-        self.l4 = nn.Linear(1000, 1)
-        self.sigmoid = nn.Sigmoid()
-
-    def forward(self, wave):
-        wave = F.relu(self.l1(wave))
-        wave = F.relu(self.l2(wave))
-        wave = F.relu(self.l3(wave))
-        wave = self.l4(wave)
-        return self.sigmoid(wave)
-
-
-class ANN1(nn.Module):
-    def __init__(self):
-        super(ANN1, self).__init__()
-
-        self.l1 = nn.Linear(6000, 5000)
-        self.l2 = nn.Linear(5000, 4000)
-        self.l3 = nn.Linear(4000, 3000)
-        self.l4 = nn.Linear(3000, 2000)
-        self.l5 = nn.Linear(2000, 1000)
-        self.l6 = nn.Linear(1000, 1)
-        self.sigmoid = nn.Sigmoid()
-
-    def forward(self, wave):
-        wave = F.relu(self.l1(wave))
-        wave = F.relu(self.l2(wave))
-        wave = F.relu(self.l3(wave))
-        wave = F.relu(self.l4(wave))
-        wave = F.relu(self.l5(wave))
-        wave = self.l6(wave)
-        return self.sigmoid(wave)
-
-
 class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()

@@ -256,7 +256,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                          pd_val_loss], axis=1)
 
     pd_data.to_csv(f'LearningCurves/{dataset_name}/'
-                   f'{model_name}.csv', index=False)
+                   f'{model_name}_{best_n_batches}.csv', index=False)
 
     # Plot train and validation accuracies
     learning_curve_acc(tr_accuracies, val_accuracies,

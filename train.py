@@ -240,19 +240,29 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     os.makedirs(f'LearningCurves/{dataset_name}/Accuracy', exist_ok=True)
     os.makedirs(f'LearningCurves/{dataset_name}/Loss', exist_ok=True)
 
-    pd_accs = pd.DataFrame({'Train': tr_accuracies,
-                            'Validation': val_accuracies,
-                            'Best batch number': best_n_batches})
+    pd_train_acc = pd.DataFrame({'Train': tr_accuracies})
+    pd_train_loss = pd.DataFrame({'Loss': tr_losses})
 
-    pd_loss = pd.DataFrame({'Train': tr_losses,
-                            'Validation': val_losses,
-                            'Best batch number': best_n_batches})
+    pd_val_acc = pd.DataFrame({'Train': val_accuracies})
+    pd_val_loss = pd.DataFrame({'Loss': val_losses})
 
-    pd_accs.to_csv(f'LearningCurves/{dataset_name}/Accuracy/{model_name}.csv',
-                   index=False)
+    pd_best_batch = pd.DataFrame({'BestBatch': best_n_batches})
 
-    pd_loss.to_csv(f'LearningCurves/{dataset_name}/Loss/{model_name}.csv',
-                   index=False)
+    pd_acc_data = pd.concat([pd_train_acc,
+                             pd_train_loss,
+                             pd_best_batch], ignore_index=True, axis=1)
+
+    pd_loss_data = pd.concat([pd_val_acc,
+                              pd_val_loss,
+                              pd_acc_data], ignore_index=True, axis=1)
+
+    pd_acc_data.to_csv(f'LearningCurves/{dataset_name}/'
+                       f'Accuracy/{model_name}.csv',
+                       index=False)
+
+    pd_loss_data.to_csv(f'LearningCurves/{dataset_name}/'
+                        f'Loss/{model_name}.csv',
+                        index=False)
 
     # Plot train and validation accuracies
     learning_curve_acc(tr_accuracies, val_accuracies,

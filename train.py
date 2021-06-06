@@ -114,17 +114,17 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     tr_losses = []
     val_losses = []
 
-    # Early stopping
-    val_acc = 1
-    early = np.zeros(patience).tolist()
+    # Early stopping counter
+    early_counter = 0
+    current_best_acc = np.inf
+    best_n_batches = 0
+    total_batches = 0
 
     with tqdm.tqdm(total=epochs, desc='Epochs', position=0) as epoch_bar:
         for epoch in range(epochs):
 
-            n_correct, n_total = 0, 0
-
             # Early stopping
-            if all(val_acc <= i for i in early) and earlystop:
+            if early_counter >= patience and epoch > 0 and earlystop:
                 break
 
             with tqdm.tqdm(total=len(train_loader),
@@ -144,8 +144,8 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     pred = torch.round(outputs)
 
                     # Calculate accuracy on current batch
-                    n_total += labels.size(0)
-                    n_correct += (pred == labels).sum().item()
+                    n_total = labels.size(0)
+                    n_correct = (pred == labels).sum().item()
                     train_acc = 100 * n_correct / n_total
 
                     # Calculate loss
@@ -194,10 +194,6 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                         # Calculate validation accuracy
                         val_acc = 100 * correct_val / total_val
 
-                        # Save acc for early stopping
-                        early.pop(0)
-                        early.append(val_acc)
-
                     # Save loss to list
                     val_losses.append(val_avg_loss)
                     tr_losses.append(loss.cpu().detach().numpy())
@@ -206,10 +202,29 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     tr_accuracies.append(train_acc)
                     val_accuracies.append(val_acc)
 
+                    # Update number of batches
+                    total_batches += 1
                     batch_bar.update()
 
+                    # Check if performance increased
+                    if val_acc > current_best_acc:
+                        # earlystop counter 0
+                        early_counter = 0
+
+                        # guardar checkpoint
+                        best_model_params = net.state_dict()
+
+                        # guardar mejor numero de batches
+                        best_n_batches = total_batches
+
+                        # actualizar current_best_acc
+                        current_best_acc = val_acc
+
+                    else:
+                        early_counter += 1
+
                     # Early stopping
-                    if all(val_acc <= i for i in early) and earlystop:
+                    if early_counter >= patience and epoch > 0 and earlystop:
                         break
 
                 epoch_bar.update()
@@ -225,8 +240,13 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     os.makedirs(f'LearningCurves/{dataset_name}/Accuracy', exist_ok=True)
     os.makedirs(f'LearningCurves/{dataset_name}/Loss', exist_ok=True)
 
-    pd_accs = pd.DataFrame({'Train': tr_accuracies, 'Validation': val_accuracies})
-    pd_loss = pd.DataFrame({'Train': tr_losses, 'Validation': val_losses})
+    pd_accs = pd.DataFrame({'Train': tr_accuracies,
+                            'Validation': val_accuracies,
+                            'Best batch number': best_n_batches})
+
+    pd_loss = pd.DataFrame({'Train': tr_losses,
+                            'Validation': val_losses,
+                            'Best batch number': best_n_batches})
 
     pd_accs.to_csv(f'LearningCurves/{dataset_name}/Accuracy/{model_name}.csv',
                    index=False)
@@ -249,7 +269,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     if not os.path.exists(model_folder):
         os.makedirs(model_folder, exist_ok=True)
 
-    torch.save(net.state_dict(),
+    torch.save(best_model_params,
                f'{model_folder.split("/")[-1]}/{model_name}.pth')
 
 

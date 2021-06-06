@@ -116,7 +116,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
 
     # Early stopping counter
     early_counter = 0
-    current_best_acc = np.inf
+    current_best_acc = 0
     best_n_batches = 0
     total_batches = 0
 

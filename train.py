@@ -246,7 +246,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     pd_val_acc = pd.DataFrame({'Train': val_accuracies})
     pd_val_loss = pd.DataFrame({'Loss': val_losses})
 
-    pd_best_batch = pd.DataFrame({'BestBatch': best_n_batches})
+    pd_best_batch = pd.DataFrame({'BestBatch': [best_n_batches]})
 
     pd_acc_data = pd.concat([pd_train_acc,
                              pd_train_loss,

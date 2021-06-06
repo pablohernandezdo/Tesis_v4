@@ -123,6 +123,9 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     with tqdm.tqdm(total=epochs, desc='Epochs', position=0) as epoch_bar:
         for epoch in range(epochs):
 
+            # Number of correctly classfied training examples
+            n_total, n_correct = 0, 0
+
             # Early stopping
             #if early_counter >= patience and epoch > 0 and earlystop:
             if early_counter >= patience and earlystop:
@@ -145,8 +148,8 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     pred = torch.round(outputs)
 
                     # Calculate accuracy on current batch
-                    n_total = labels.size(0)
-                    n_correct = (pred == labels).sum().item()
+                    n_total += labels.size(0)
+                    n_correct += (pred == labels).sum().item()
                     train_acc = 100 * n_correct / n_total
 
                     # Calculate loss

@@ -256,14 +256,12 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     pd_acc_data = pd.concat([pd_train_acc,
                              pd_train_loss,
                              pd_best_batch],
-                            keys=["Accuracy", "Loss", "BestBatch"],
-                            ignore_index=True, axis=1)
+                            keys=["Accuracy", "Loss", "BestBatch"], axis=1)
 
     pd_loss_data = pd.concat([pd_val_acc,
                               pd_val_loss,
                               pd_acc_data],
-                             keys=["Accuracy", "Loss", "BestBatch"],
-                             ignore_index=True, axis=1)
+                             keys=["Accuracy", "Loss", "BestBatch"], axis=1)
 
     pd_acc_data.to_csv(f'LearningCurves/{dataset_name}/'
                        f'Accuracy/{model_name}.csv',

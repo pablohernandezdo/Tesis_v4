@@ -242,36 +242,21 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
 
     # EVAL ITER VA A TENER QUE SER SIEMPRE 1
     # Save train and validation accuracies/losses to csv
-    os.makedirs(f'LearningCurves/{dataset_name}/Accuracy', exist_ok=True)
-    os.makedirs(f'LearningCurves/{dataset_name}/Loss', exist_ok=True)
+    os.makedirs(f'LearningCurves/{dataset_name}/', exist_ok=True)
 
-    pd_train_acc = pd.DataFrame({'Train': tr_accuracies})
-    pd_train_loss = pd.DataFrame({'Loss': tr_losses})
+    pd_train_acc = pd.DataFrame({'TrainAcc': tr_accuracies})
+    pd_train_loss = pd.DataFrame({'TrainLoss': tr_losses})
 
-    pd_val_acc = pd.DataFrame({'Train': val_accuracies})
-    pd_val_loss = pd.DataFrame({'Loss': val_losses})
+    pd_val_acc = pd.DataFrame({'ValAcc': val_accuracies})
+    pd_val_loss = pd.DataFrame({'ValLoss': val_losses})
 
-    pd_best_batch = pd.DataFrame({'BestBatch': [best_n_batches]})
+    pd_data = pd.concat([pd_train_acc,
+                         pd_train_loss,
+                         pd_val_acc,
+                         pd_val_loss], axis=1)
 
-    pd_acc_data = pd.concat([pd_train_acc,
-                             pd_train_loss,
-                             pd_best_batch],
-                            keys=["Accuracy", "Loss", "BestBatch"],
-                            ignore_index=True, axis=1)
-
-    pd_loss_data = pd.concat([pd_val_acc,
-                              pd_val_loss,
-                              pd_acc_data],
-                             keys=["Accuracy", "Loss", "BestBatch"],
-                             ignore_index=True, axis=1)
-
-    pd_acc_data.to_csv(f'LearningCurves/{dataset_name}/'
-                       f'Accuracy/{model_name}.csv',
-                       index=False)
-
-    pd_loss_data.to_csv(f'LearningCurves/{dataset_name}/'
-                        f'Loss/{model_name}.csv',
-                        index=False)
+    pd_data.to_csv(f'LearningCurves/{dataset_name}/'
+                   f'{model_name}.csv', index=False)
 
     # Plot train and validation accuracies
     learning_curve_acc(tr_accuracies, val_accuracies,

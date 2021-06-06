@@ -6,6 +6,7 @@ from pathlib import Path
 import tqdm
 import torch
 import numpy as np
+import pandas as pd
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
@@ -39,7 +40,7 @@ def main():
                         help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=256,
                         help="Size of the batches")
-    parser.add_argument("--eval_iter", type=int, default=10,
+    parser.add_argument("--eval_iter", type=int, default=1,
                         help="Number of batches between validations")
     parser.add_argument("--earlystop", type=int, default=1,
                         help="Early stopping flag, 0 no early stopping")
@@ -218,6 +219,20 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
 
     else:
         model_dirname = ""
+
+    # EVAL ITER VA A TENER QUE SER SIEMPRE 1
+    # Save train and validation accuracies/losses to csv
+    os.makedirs(f'LearningCurves/{dataset_name}/Accuracy', exist_ok=True)
+    os.makedirs(f'LearningCurves/{dataset_name}/Loss', exist_ok=True)
+
+    pd_accs = pd.DataFrame({'Train': tr_accuracies, 'Validation': val_accuracies})
+    pd_loss = pd.DataFrame({'Train': tr_losses, 'Validation': val_losses})
+
+    pd_accs.to_csv(f'LearningCurves/{dataset_name}/Accuracy/{model_name}.csv',
+                   index=False)
+
+    pd_loss.to_csv(f'LearningCurves/{dataset_name}/Loss/{model_name}.csv',
+                   index=False)
 
     # Plot train and validation accuracies
     learning_curve_acc(tr_accuracies, val_accuracies,

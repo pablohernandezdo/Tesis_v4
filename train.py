@@ -124,7 +124,8 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
         for epoch in range(epochs):
 
             # Early stopping
-            if early_counter >= patience and epoch > 0 and earlystop:
+            #if early_counter >= patience and epoch > 0 and earlystop:
+            if early_counter >= patience and earlystop:
                 break
 
             with tqdm.tqdm(total=len(train_loader),
@@ -224,7 +225,8 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                         early_counter += 1
 
                     # Early stopping
-                    if early_counter >= patience and epoch > 0 and earlystop:
+                    #if early_counter >= patience and epoch > 0 and earlystop:
+                    if early_counter >= patience and earlystop:
                         break
 
                 epoch_bar.update()

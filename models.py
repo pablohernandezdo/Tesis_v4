@@ -6,9 +6,9 @@ class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
 
-        self.l1 = nn.Linear(6000, 2000)
-        self.l2 = nn.Linear(2000, 2000)
-        self.l3 = nn.Linear(2000, 1)
+        self.l1 = nn.Linear(6000, 4000)
+        self.l2 = nn.Linear(4000, 1000)
+        self.l3 = nn.Linear(1000, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, wave):
@@ -96,7 +96,8 @@ class CRED(nn.Module):
         self.res2bn1 = nn.BatchNorm1d(16)
         self.res2bn2 = nn.BatchNorm1d(16)
 
-        self.bnlstm = nn.BatchNorm1d(64)
+        self.bnlstm = nn.BatchNorm1d(16)
+        self.bnlinear = nn.BatchNorm1d(128)
 
         self.sigmoid = nn.Sigmoid()
 
@@ -104,7 +105,7 @@ class CRED(nn.Module):
         x = x.view(-1, 1, 6000)
 
         # Primera capa CNN
-        x = F.relu(self.conv1(x))
+        x = self.conv1(x)
         identity = x
 
         # Residual block 1
@@ -114,7 +115,7 @@ class CRED(nn.Module):
         x += identity
 
         # Segunda capa CNN
-        x = F.relu(self.conv2(x))
+        x = self.conv2(x)
         identity = x
 
         # Residual block 2
@@ -126,21 +127,28 @@ class CRED(nn.Module):
         # Time redistribution
         # x = x.permute(0, 2, 1)
 
-        # Bi LSTM residual block
+        # Bi LSTM
         x, _ = self.bilstm1(x)
-        # x = self.bnlstm(x)
+        x = self.bnlstm(x)
         x = self.dropbi(x)
 
+        # Bi LSTM residual block
+        identity = x
         x, _ = self.bilstm2(x)
-        # x = self.bnlstm(x)
+        x += identity
+        x = self.bnlstm(x)
         x = self.dropbi(x)
 
         # LSTM
         x, _ = self.lstm(x)
+        x = self.bnlstm(x)
         x = self.droplstm(x)
 
         # Linear
         x = self.l1(x[:, -1, :])
+        x = self.bnlinear(x)
+        x = self.droplstm(x)
+
         x = self.l2(x)
 
         return self.sigmoid(x)

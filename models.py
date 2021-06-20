@@ -6,9 +6,9 @@ class ANN(nn.Module):
     def __init__(self):
         super(ANN, self).__init__()
 
-        self.l1 = nn.Linear(6000, 2000)
-        self.l2 = nn.Linear(2000, 2000)
-        self.l3 = nn.Linear(2000, 1)
+        self.l1 = nn.Linear(6000, 4000)
+        self.l2 = nn.Linear(4000, 3000)
+        self.l3 = nn.Linear(3000, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, wave):
@@ -22,28 +22,28 @@ class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
 
-        self.conv1 = nn.Conv1d(1, 100, 3, padding=1, stride=1)
-        self.conv2 = nn.Conv1d(100, 200, 3, padding=1, stride=2)
-        self.conv3 = nn.Conv1d(200, 300, 3, padding=1, stride=1)
-        self.conv4 = nn.Conv1d(300, 500, 3, padding=1, stride=2)
-        self.conv5 = nn.Conv1d(500, 1000, 3, padding=1, stride=1)
-        self.conv6 = nn.Conv1d(1000, 1500, 3, padding=1, stride=2)
-        self.conv7 = nn.Conv1d(1500, 3000, 3, padding=1, stride=1)
-        self.conv8 = nn.Conv1d(3000, 6000, 3, padding=1, stride=2)
-        self.l1 = nn.Linear(6000, 1000)
-        self.l2 = nn.Linear(1000, 1)
+        self.conv1 = nn.Conv1d(1, 8, 3, padding=1, stride=1)
+        self.conv2 = nn.Conv1d(8, 8, 3, padding=1, stride=2)
+        self.conv3 = nn.Conv1d(8, 16, 3, padding=1, stride=1)
+        self.conv4 = nn.Conv1d(16, 16, 3, padding=1, stride=2)
+        self.conv5 = nn.Conv1d(16, 32, 3, padding=1, stride=1)
+        self.conv6 = nn.Conv1d(32, 32, 3, padding=1, stride=2)
+        self.conv7 = nn.Conv1d(32, 64, 3, padding=1, stride=1)
+        self.conv8 = nn.Conv1d(64, 64, 3, padding=1, stride=2)
+        self.l1 = nn.Linear(64, 32)
+        self.l2 = nn.Linear(32, 1)
         self.p1 = nn.MaxPool1d(3)
         self.p2 = nn.MaxPool1d(5)
         self.p3 = nn.MaxPool1d(5)
         self.p4 = nn.MaxPool1d(5)
-        self.bn1 = nn.BatchNorm1d(100)
-        self.bn2 = nn.BatchNorm1d(200)
-        self.bn3 = nn.BatchNorm1d(300)
-        self.bn4 = nn.BatchNorm1d(500)
-        self.bn5 = nn.BatchNorm1d(1000)
-        self.bn6 = nn.BatchNorm1d(1500)
-        self.bn7 = nn.BatchNorm1d(3000)
-        self.bn8 = nn.BatchNorm1d(6000)
+        self.bn1 = nn.BatchNorm1d(8)
+        self.bn2 = nn.BatchNorm1d(8)
+        self.bn3 = nn.BatchNorm1d(16)
+        self.bn4 = nn.BatchNorm1d(16)
+        self.bn5 = nn.BatchNorm1d(32)
+        self.bn6 = nn.BatchNorm1d(32)
+        self.bn7 = nn.BatchNorm1d(64)
+        self.bn8 = nn.BatchNorm1d(64)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, wave):
@@ -96,7 +96,8 @@ class CRED(nn.Module):
         self.res2bn1 = nn.BatchNorm1d(16)
         self.res2bn2 = nn.BatchNorm1d(16)
 
-        self.bnlstm = nn.BatchNorm1d(64)
+        self.bnlstm = nn.BatchNorm1d(16)
+        self.bnlinear = nn.BatchNorm1d(128)
 
         self.sigmoid = nn.Sigmoid()
 
@@ -104,43 +105,50 @@ class CRED(nn.Module):
         x = x.view(-1, 1, 6000)
 
         # Primera capa CNN
-        x = F.relu(self.conv1(x))
+        x = self.conv1(x)
         identity = x
 
         # Residual block 1
         x = F.relu(self.bn1(x))
         x = F.relu(self.res1bn1(self.res1conv1(x)))
         x = F.relu(self.res1bn2(self.res1conv2(x)))
-        x += identity
+        x = x + identity
 
         # Segunda capa CNN
-        x = F.relu(self.conv2(x))
+        x = self.conv2(x)
         identity = x
 
         # Residual block 2
         x = F.relu(self.bn2(x))
         x = F.relu(self.res2bn1(self.res2conv1(x)))
         x = F.relu(self.res2bn2(self.res2conv2(x)))
-        x += identity
+        x = x + identity
 
         # Time redistribution
         # x = x.permute(0, 2, 1)
 
-        # Bi LSTM residual block
+        # Bi LSTM
         x, _ = self.bilstm1(x)
-        # x = self.bnlstm(x)
+        x = self.bnlstm(x)
         x = self.dropbi(x)
 
+        # Bi LSTM residual block
+        identity = x
         x, _ = self.bilstm2(x)
-        # x = self.bnlstm(x)
+        x = x + identity
+        x = self.bnlstm(x)
         x = self.dropbi(x)
 
         # LSTM
         x, _ = self.lstm(x)
+        x = self.bnlstm(x)
         x = self.droplstm(x)
 
         # Linear
         x = self.l1(x[:, -1, :])
+        x = self.bnlinear(x)
+        x = self.droplstm(x)
+
         x = self.l2(x)
 
         return self.sigmoid(x)

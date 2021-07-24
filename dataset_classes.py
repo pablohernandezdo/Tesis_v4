@@ -200,6 +200,17 @@ class DatasetBelgica(Dsets):
         self.cfts = []
 
         for tr in self.traces:
+
+            # Eliminar tendencia lineal
+            tr = detrend(tr)
+
+            # Eliminar valor medio
+            tr -= np.mean(tr)
+
+            # Normalizar
+            if np.amax(np.abs(tr)):
+                tr /= np.amax(np.abs(tr))
+
             cft = classic_sta_lta(tr, nsta, nlta)
             self.cfts.append(cft)
 

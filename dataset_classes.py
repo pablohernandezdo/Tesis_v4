@@ -209,6 +209,9 @@ class DatasetBelgica(Dsets):
         # Ordenar por maximo STA/LTA
         idxs = np.argsort(np.max(self.cfts, axis=1))
         self.traces = self.traces[idxs, :]
+
+        # Retornar solo las necesarias
+        self.traces = self.traces[:n_traces]
         
         print(f"Saving npy format dataset in {self.savepath}")
         self.save_dataset(self.traces, self.savepath, 'Belgica')

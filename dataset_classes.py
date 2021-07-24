@@ -198,6 +198,7 @@ class DatasetBelgica(Dsets):
         nlta = 100 * self.fs
 
         self.cfts = []
+        self.preprocessed_traces = []
 
         for tr in self.traces:
 
@@ -211,8 +212,11 @@ class DatasetBelgica(Dsets):
             if np.amax(np.abs(tr)):
                 tr /= np.amax(np.abs(tr))
 
+            # STA / LTA
             cft = classic_sta_lta(tr, nsta, nlta)
+
             self.cfts.append(cft)
+            self.preprocessed_traces.append(tr)
 
         # Resultados STA/LTA
         self.cfts = np.asarray(self.cfts)
@@ -220,12 +224,13 @@ class DatasetBelgica(Dsets):
         # Ordenar por maximo STA/LTA
         idxs = np.argsort(np.max(self.cfts, axis=1))
         self.traces = self.traces[idxs, :]
+        self.preprocessed_traces = self.preprocessed_traces[idxs, :]
 
         # Retornar solo las necesarias
-        self.traces = self.traces[:n_traces]
+        self.preprocessed_traces = self.preprocessed_traces[:n_traces]
         
         print(f"Saving npy format dataset in {self.savepath}")
-        self.save_dataset(self.traces, self.savepath, 'Belgica')
+        self.save_dataset(self.preprocessed_traces, self.savepath, 'Belgica')
 
 class DatasetReykjanes(Dsets):
     def __init__(self, dataset_path, savepath, unproc_savepath):

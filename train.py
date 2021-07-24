@@ -38,6 +38,8 @@ def main():
                         help="HDF5 validation Dataset path")
     parser.add_argument("--device", type=int, default=3,
                         help="set cuda device")
+    parser.add_argument("--workers", type=int, default=0,
+                        help="Dataloader num workers")
     parser.add_argument("--epochs", type=int, default=1,
                         help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=256,
@@ -66,14 +68,14 @@ def main():
     train_loader = DataLoader(train_set,
                               batch_size=args.batch_size,
                               shuffle=True,
-                              num_workers=8)
+                              num_workers=args.workers)
 
     # Validation dataset
     val_set = NpyDataset(args.val_path)
     val_loader = DataLoader(val_set,
                             batch_size=args.batch_size,
                             shuffle=True,
-                            num_workers=8)
+                            num_workers=args.workers)
 
     # Load specified Classifier
     net = get_classifier(args.classifier)

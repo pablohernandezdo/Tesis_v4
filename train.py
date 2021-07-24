@@ -36,6 +36,8 @@ def main():
                         help="HDF5 train Dataset path")
     parser.add_argument("--val_path", default='Validation_data.hdf5',
                         help="HDF5 validation Dataset path")
+    parser.add_argument("--device", type=int, default=3,
+                        help="set cuda device")
     parser.add_argument("--epochs", type=int, default=1,
                         help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=256,
@@ -57,7 +59,7 @@ def main():
     args = parser.parse_args()
 
     # Select training device
-    device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
+    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
 
     # Train dataset
     train_set = NpyDataset(args.train_path)

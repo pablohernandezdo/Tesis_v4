@@ -178,55 +178,40 @@ class DatasetNevada(Dsets):
 
 
 class DatasetBelgica(Dsets):
-    def __init__(self, dataset_path, savepath):
+    def __init__(self, dataset_path, savepath, n_traces=12547):
         super(DatasetBelgica, self).__init__()
 
         self.dataset_path = dataset_path
         self.savepath = savepath
         self.fs = 10
-        self.n_traces = 7000
+        self.n_traces = n_traces
 
         # Dataset de ruido, no es necesario preprocesar
         print(f"Reading dataset from path: {self.dataset_path}")
         self.traces = sio.loadmat(self.dataset_path)["Data_2D"]
+        self.traces = self.traces.reshape(-1, 6000)
 
-        self.noise_traces = []
+        # self.noise_traces = []
 
         # ventanas en tiempo
-        sta_t = 3
-        lta_t = 25
+        nsta = 20 * self.fs
+        nlta = 100 * self.fs
 
-        # ventanas en muestras
-        sta_n = sta_t * self.fs * 10
-        lta_n = lta_t * self.fs * 10
+        self.cfts = []
 
-        copied = 0
+        for tr in self.traces:
+            cft = classic_sta_lta(tr, nsta, nlta)
+            self.cfts.append(cft)
 
-        for trace in self.traces:
-            trace = trace.reshape(-1, 6000)
+        # Resultados STA/LTA
+        self.cfts = np.asarray(self.cfts)
 
-            for tr in trace:
-                tr = detrend(tr)
-                tr = tr - np.mean(tr)
-                tr /= np.amax(tr)
-
-                cft = classic_sta_lta(tr, sta_n, lta_n)
-
-                if np.amax(cft) < 2:
-                    copied += 1
-                    self.noise_traces.append(tr)
-
-                if copied == self.n_traces:
-                    break
-
-            if copied == self.n_traces:
-                break
-
-        self.noise_traces = np.asarray(self.noise_traces)
-
+        # Ordenar por maximo STA/LTA
+        idxs = np.argsort(np.max(cfts, axis=1))
+        self.traces = self.traces[idxs, :]
+        
         print(f"Saving npy format dataset in {self.savepath}")
-        self.save_dataset(self.noise_traces, self.savepath, 'Belgica')
-
+        self.save_dataset(self.traces, self.savepath, 'Belgica')
 
 class DatasetReykjanes(Dsets):
     def __init__(self, dataset_path, savepath, unproc_savepath):

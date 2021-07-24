@@ -220,6 +220,7 @@ class DatasetBelgica(Dsets):
 
         # Resultados STA/LTA
         self.cfts = np.asarray(self.cfts)
+        self.preprocessed_traces = np.asarray(self.preprocessed_traces)
 
         # Ordenar por maximo STA/LTA
         idxs = np.argsort(np.max(self.cfts, axis=1))

@@ -16,3 +16,4 @@ python train_til_batch.py \
         --dataset_name "STEAD" \
         --train_path "Data/TrainReady/train_zeros.npy" \
         --val_path "Data/TrainReady/val_zeros.npy"
+        

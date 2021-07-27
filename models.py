@@ -111,7 +111,7 @@ class CRED(nn.Module):
         x = F.relu(self.bn1(x))
         x = F.relu(self.res1bn1(self.res1conv1(x)))
         x = F.relu(self.res1bn2(self.res1conv2(x)))
-        x += identity
+        x = x + identity
 
         # Segunda capa CNN
         x = self.conv2(x)
@@ -121,7 +121,7 @@ class CRED(nn.Module):
         x = F.relu(self.bn2(x))
         x = F.relu(self.res2bn1(self.res2conv1(x)))
         x = F.relu(self.res2bn2(self.res2conv2(x)))
-        x += identity
+        x = x + identity
 
         # Time redistribution
         # x = x.permute(0, 2, 1)
@@ -134,7 +134,7 @@ class CRED(nn.Module):
         # Bi LSTM residual block
         identity = x
         x, _ = self.bilstm2(x)
-        x += identity
+        x = x + identity
         x = self.bnlstm(x)
         x = self.dropbi(x)
 

@@ -7,8 +7,8 @@ class ANN(nn.Module):
         super(ANN, self).__init__()
 
         self.l1 = nn.Linear(6000, 4000)
-        self.l2 = nn.Linear(4000, 1000)
-        self.l3 = nn.Linear(1000, 1)
+        self.l2 = nn.Linear(4000, 2000)
+        self.l3 = nn.Linear(2000, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, wave):
@@ -22,28 +22,28 @@ class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
 
-        self.conv1 = nn.Conv1d(1, 100, 3, padding=1, stride=1)
-        self.conv2 = nn.Conv1d(100, 200, 3, padding=1, stride=2)
-        self.conv3 = nn.Conv1d(200, 300, 3, padding=1, stride=1)
-        self.conv4 = nn.Conv1d(300, 500, 3, padding=1, stride=2)
-        self.conv5 = nn.Conv1d(500, 1000, 3, padding=1, stride=1)
-        self.conv6 = nn.Conv1d(1000, 1500, 3, padding=1, stride=2)
-        self.conv7 = nn.Conv1d(1500, 3000, 3, padding=1, stride=1)
-        self.conv8 = nn.Conv1d(3000, 6000, 3, padding=1, stride=2)
-        self.l1 = nn.Linear(6000, 1000)
-        self.l2 = nn.Linear(1000, 1)
+        self.conv1 = nn.Conv1d(1, 8, 3, padding=1, stride=1)
+        self.conv2 = nn.Conv1d(8, 8, 3, padding=1, stride=2)
+        self.conv3 = nn.Conv1d(8, 16, 3, padding=1, stride=1)
+        self.conv4 = nn.Conv1d(16, 16, 3, padding=1, stride=2)
+        self.conv5 = nn.Conv1d(16, 32, 3, padding=1, stride=1)
+        self.conv6 = nn.Conv1d(32, 32, 3, padding=1, stride=2)
+        self.conv7 = nn.Conv1d(32, 64, 3, padding=1, stride=1)
+        self.conv8 = nn.Conv1d(64, 64, 3, padding=1, stride=2)
+        self.l1 = nn.Linear(64, 32)
+        self.l2 = nn.Linear(32, 1)
         self.p1 = nn.MaxPool1d(3)
         self.p2 = nn.MaxPool1d(5)
         self.p3 = nn.MaxPool1d(5)
         self.p4 = nn.MaxPool1d(5)
-        self.bn1 = nn.BatchNorm1d(100)
-        self.bn2 = nn.BatchNorm1d(200)
-        self.bn3 = nn.BatchNorm1d(300)
-        self.bn4 = nn.BatchNorm1d(500)
-        self.bn5 = nn.BatchNorm1d(1000)
-        self.bn6 = nn.BatchNorm1d(1500)
-        self.bn7 = nn.BatchNorm1d(3000)
-        self.bn8 = nn.BatchNorm1d(6000)
+        self.bn1 = nn.BatchNorm1d(8)
+        self.bn2 = nn.BatchNorm1d(8)
+        self.bn3 = nn.BatchNorm1d(16)
+        self.bn4 = nn.BatchNorm1d(16)
+        self.bn5 = nn.BatchNorm1d(32)
+        self.bn6 = nn.BatchNorm1d(32)
+        self.bn7 = nn.BatchNorm1d(64)
+        self.bn8 = nn.BatchNorm1d(64)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, wave):
@@ -64,7 +64,6 @@ class CNN(nn.Module):
         wave = F.relu(self.l1(wave))
         wave = self.l2(wave)
         return self.sigmoid(wave)
-
 
 class CRED(nn.Module):
     def __init__(self):

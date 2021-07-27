@@ -213,6 +213,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     if total_batches == final_batch:
                         best_model_params = net.state_dict()
                         best_n_batches = total_batches
+                        break
 
                 epoch_bar.update()
 

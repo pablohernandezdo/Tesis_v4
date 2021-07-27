@@ -19,7 +19,7 @@ python train_til_batch.py \
 
 # CNN2
 echo "Training model Cnn2, lr = 1e-3, epochs = 30, batch_size = 256"
-python train.py \
+python train_til_batch.py \
         --lr 1e-3 \
         --device 3 \
         --epochs 30 \
@@ -36,7 +36,7 @@ python train.py \
 
 # CRED
 echo "Training model CRED, lr = 1e-4, epochs = 30, batch_size = 256"
-python train.py \
+python train_til_batch.py \
         --lr 1e-4 \
         --device 3 \
         --epochs 30 \

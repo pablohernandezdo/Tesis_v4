@@ -10,10 +10,9 @@ python train_til_batch.py \
         --final_batch 100 \
         --earlystop 0 \
         --eval_iter 30 \
-        --model_folder 'models/batches'  \
+        --model_folder 'modelos_batches'  \
         --classifier ANN \
         --model_name ANN_4k_2k_1e4_256 \
         --dataset_name "STEAD" \
         --train_path "Data/TrainReady/train_zeros.npy" \
         --val_path "Data/TrainReady/val_zeros.npy"
-        

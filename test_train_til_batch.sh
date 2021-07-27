@@ -7,7 +7,7 @@ python train.py \
         --device 2 \
         --epochs 30 \
         --batch_size 256 \
-        -final_batch 100\
+        --final_batch 100\
         --earlystop 0 \
         --eval_iter 30 \
         --model_folder 'models/batches'  \

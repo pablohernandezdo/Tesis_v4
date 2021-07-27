@@ -37,9 +37,9 @@
 #P2=$!
 
 # CRED
-echo "Training model CRED, lr = 1e-3, epochs = 30, batch_size = 256"
+echo "Training model CRED, lr = 1e-4, epochs = 30, batch_size = 256"
 python train.py \
-        --lr 1e-3 \
+        --lr 1e-4 \
         --device 3 \
         --epochs 30 \
         --batch_size 256 \
@@ -47,10 +47,30 @@ python train.py \
         --eval_iter 30 \
         --model_folder 'models'  \
         --classifier CRED \
-        --model_name CRED_1e3_256 \
+        --model_name CRED_1e4_256 \
+        --dataset_name "STEAD" \
+        --train_path "Data/TrainReady/train_zeros.npy" \
+        --val_path "Data/TrainReady/val_zeros.npy" &
+
+P1=$!
+
+# CRED
+echo "Training model CRED, lr = 1e-5, epochs = 30, batch_size = 256"
+python train.py \
+        --lr 1e-5 \
+        --device 3 \
+        --epochs 30 \
+        --batch_size 256 \
+        --earlystop 0 \
+        --eval_iter 30 \
+        --model_folder 'models'  \
+        --classifier CRED \
+        --model_name CRED_1e5_256 \
         --dataset_name "STEAD" \
         --train_path "Data/TrainReady/train_zeros.npy" \
         --val_path "Data/TrainReady/val_zeros.npy" 
 
+P2=$!
+wait $P1 $P2
 #P3=$!
 #wait $P1 $P2 $P3

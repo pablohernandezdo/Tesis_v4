@@ -207,12 +207,12 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
 
                     # Update number of batches
                     total_batches += 1
+                    batch_bar.update()
 
                     # If reaches final batch
                     if total_batches == final_batch:
                         best_model_params = net.state_dict()
                         best_n_batches = total_batches
-                    batch_bar.update()
 
                 epoch_bar.update()
 

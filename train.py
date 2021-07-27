@@ -36,12 +36,12 @@ def main():
                         help="HDF5 train Dataset path")
     parser.add_argument("--val_path", default='Validation_data.hdf5',
                         help="HDF5 validation Dataset path")
-    parser.add_argument("--device", type=int, default=3,
-                        help="set cuda device")
-    parser.add_argument("--workers", type=int, default=0,
-                        help="Dataloader num workers")
     parser.add_argument("--epochs", type=int, default=1,
                         help="Number of training epochs")
+    parser.add_argument("--device", type=int, default=3,
+                        help="Training gpu device")
+    parser.add_argument("--workers", type=int, default=0,
+                        help="Dataloader num workers")
     parser.add_argument("--batch_size", type=int, default=256,
                         help="Size of the batches")
     parser.add_argument("--eval_iter", type=int, default=1,
@@ -102,6 +102,7 @@ def main():
     train_time = train_end - start_time
 
     print(f'Execution details: \n{args}\n'
+          f'Classifier: {args.classifier}\n'
           f'Number of parameters: {params}\n'
           f'Training time: {format_timespan(train_time)}')
 
@@ -252,25 +253,29 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     pd_val_acc = pd.DataFrame({'ValAcc': val_accuracies})
     pd_val_loss = pd.DataFrame({'ValLoss': val_losses})
 
+    best_n_batches = [best_n_batches] * len(tr_accuracies)
+    pd_n_batches = pd.DataFrame({'Train_batches': best_n_batches})
+
     pd_data = pd.concat([pd_train_acc,
                          pd_train_loss,
                          pd_val_acc,
-                         pd_val_loss], axis=1)
+                         pd_val_loss,
+                         pd_n_batches], axis=1)
 
     pd_data.to_csv(f'LearningCurves/{dataset_name}/'
-                   f'{model_name}_{best_n_batches}.csv', index=False)
+                   f'{model_name}.csv', index=False)
 
     # Plot train and validation accuracies
     learning_curve_acc(tr_accuracies, val_accuracies,
                        f'Figures/Learning_curves/{dataset_name}/'
                        f'Accuracy/{model_dirname}',
-                       model_name)
+                       model_name, best_n_batches[0])
 
     # Plot train and validation losses
     learning_curve_loss(tr_losses, val_losses,
                         f'Figures/Learning_curves/{dataset_name}/'
                         f'Loss/{model_dirname}',
-                        model_name)
+                        model_name, best_n_batches[0])
 
     if not os.path.exists(model_folder):
         os.makedirs(model_folder, exist_ok=True)
@@ -279,7 +284,8 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                f'{model_folder.split("/")[-1]}/{model_name}.pth')
 
 
-def learning_curve_acc(tr_acc, val_acc, savepath, model_name):
+def learning_curve_acc(tr_acc, val_acc, savepath,
+                       model_name, n_batch):
 
     if not os.path.exists(savepath):
         os.makedirs(savepath, exist_ok=True)
@@ -287,6 +293,7 @@ def learning_curve_acc(tr_acc, val_acc, savepath, model_name):
     plt.figure(figsize=(20, 20))
     line_tr, = plt.plot(tr_acc, label='Training accuracy')
     line_val, = plt.plot(val_acc, label='Validation accuracy')
+    plt.axvline(n_batch, label='')
     plt.grid(True)
     plt.xlabel('Batches')
     plt.ylabel('Accuracy')
@@ -295,7 +302,8 @@ def learning_curve_acc(tr_acc, val_acc, savepath, model_name):
     plt.savefig(f'{savepath}/{model_name}_accuracies.png')
 
 
-def learning_curve_loss(tr_loss, val_loss, savepath, model_name):
+def learning_curve_loss(tr_loss, val_loss, savepath,
+                        model_name, n_batch):
 
     if not os.path.exists(savepath):
         os.makedirs(savepath, exist_ok=True)
@@ -303,6 +311,7 @@ def learning_curve_loss(tr_loss, val_loss, savepath, model_name):
     plt.figure(figsize=(20, 20))
     line_tr, = plt.plot(tr_loss, label='Training Loss')
     line_val, = plt.plot(val_loss, label='Validation Loss')
+    plt.axvline(n_batch, label='')
     plt.grid(True)
     plt.xlabel('Batches')
     plt.ylabel('Loss')

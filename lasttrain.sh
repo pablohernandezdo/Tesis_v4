@@ -13,8 +13,8 @@ python train.py \
         --classifier ANN \
         --model_name ANN_4k_2k_1e4_256 \
         --dataset_name "STEAD" \
-        --train_path "Data/TrainReady/Extracto-STEAD_0.8_train.npy" \
-        --val_path "Data/TrainReady/Extracto-STEAD_0.1_val.npy" &
+        --train_path "Data/TrainReady/train_zeros.npy" \
+        --val_path "Data/TrainReady/val_zeros.npy" &
 
 P1=$!
 
@@ -31,8 +31,8 @@ python train.py \
         --classifier CNN \
         --model_name CNN2_1e3_256 \
         --dataset_name "STEAD" \
-        --train_path "Data/TrainReady/Extracto-STEAD_0.8_train.npy" \
-        --val_path "Data/TrainReady/Extracto-STEAD_0.1_val.npy" &
+        --train_path "Data/TrainReady/train_zeros.npy" \
+        --val_path "Data/TrainReady/val_zeros.npy" &
 
 P2=$!
 
@@ -49,8 +49,8 @@ python train.py \
         --classifier CRED \
         --model_name CRED_1e3_256 \
         --dataset_name "STEAD" \
-        --train_path "Data/TrainReady/Extracto-STEAD_0.8_train.npy" \
-        --val_path "Data/TrainReady/Extracto-STEAD_0.1_val.npy" 
+        --train_path "Data/TrainReady/train_zeros.npy" \
+        --val_path "Data/TrainReady/val_zeros.npy" 
 
 P3=$!
 wait $P1 $P2 $P3

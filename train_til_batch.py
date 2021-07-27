@@ -124,11 +124,16 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     best_n_batches = 0
     total_batches = 0
 
+    finish_training = False
+
     with tqdm.tqdm(total=epochs, desc='Epochs', position=0) as epoch_bar:
         for epoch in range(epochs):
 
             # Number of correctly classfied training examples
             n_total, n_correct = 0, 0
+
+            if finish_training:
+                break
 
             with tqdm.tqdm(total=len(train_loader),
                            desc='Batches', position=1) as batch_bar:
@@ -213,6 +218,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     if total_batches == final_batch:
                         best_model_params = net.state_dict()
                         best_n_batches = total_batches
+                        finish_training = True
                         break
 
                 epoch_bar.update()

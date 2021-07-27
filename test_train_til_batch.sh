@@ -2,12 +2,12 @@
 
 # ANN_4K_2K
 echo "Training model Ann_4k_2k, lr = 1e-4, epochs = 30, batch_size = 256"
-#python train_til_batch.py \
-python train.py \
+python train_til_batch.py \
         --lr 1e-4 \
         --device 3 \
         --epochs 30 \
         --batch_size 256 \
+        --final_batch 100 \
         --earlystop 0 \
         --eval_iter 30 \
         --model_folder 'models/batches'  \
@@ -16,5 +16,3 @@ python train.py \
         --dataset_name "STEAD" \
         --train_path "Data/TrainReady/train_zeros.npy" \
         --val_path "Data/TrainReady/val_zeros.npy"
-
-# #--final_batch 100 \

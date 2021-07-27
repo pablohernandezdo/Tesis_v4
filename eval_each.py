@@ -27,10 +27,10 @@ def main():
                         help="Model to eval folder")
     parser.add_argument("--classifier", default='1h6k',
                         help="Choose classifier architecture")
-    parser.add_argument("--test_path", default='Francia.npy',
+    parser.add_argument("--test_path", default='Test_data_v2.hdf5',
                         help="HDF5 test Dataset path")
     parser.add_argument("--device", type=int, default=3,
-                        help="set cuda device")
+                        help="Training gpu device")
     parser.add_argument("--batch_size", type=int, default=256,
                         help="Size of the training batches")
     args = parser.parse_args()
@@ -62,8 +62,9 @@ def main():
     eval_end = time.time()
     total_time = eval_end - start_time
 
-    print(f'Total evaluation time: {format_timespan(total_time)}\n\n'
-          f'Number of network parameters: {params}')
+    print(f'Classifier: {args.classifier}\n'
+          f'Number of network parameters: {params}\n'
+          f'Total evaluation time: {format_timespan(total_time)}')
 
 
 def count_parameters(model):

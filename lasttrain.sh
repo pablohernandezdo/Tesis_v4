@@ -4,7 +4,7 @@
 echo "Training model Ann_4k_2k, lr = 1e-4, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-4 \
-        --device 3 \
+        --device 2 \
         --epochs 30 \
         --batch_size 256 \
         --earlystop 0 \

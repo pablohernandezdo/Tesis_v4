@@ -206,7 +206,7 @@ class DatasetBelgica(Dsets):
         self.traces = self.traces.reshape(-1, 6000)
 
         # Filtrar trazas cortas
-        self.traces = self.filter_traces_highpass(self.traces)
+        # self.traces = self.filter_traces_highpass(self.traces)
 
         # ventanas en tiempo
         nsta = 20 * self.fs

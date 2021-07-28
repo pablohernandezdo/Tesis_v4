@@ -245,16 +245,7 @@ class DatasetBelgica(Dsets):
         print(f"Saving npy format dataset in {self.savepath}")
         self.save_dataset(self.preprocessed_traces, self.savepath, 'Belgica')
 
-    def filter_traces_highpass(self, lowcut=3, order=5):
-        traces_filt = []
-
-        for tr in self.traces:
-            tr = self.butter_highpass_filter(tr, lowcut, self.fs, order=order)
-            traces_filt.append(tr)
-
-        return np.asarray(traces_filt)
-
-    def filter_traces_highpass(self, lowcut=3, order=5):
+    def filter_traces_highpass(self, lowcut=2, order=5):
         traces_filt = []
 
         for tr in self.traces:

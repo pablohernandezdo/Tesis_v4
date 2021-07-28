@@ -200,7 +200,7 @@ class DatasetBelgica(Dsets):
         self.traces = sio.loadmat(self.dataset_path)["Data_2D"]
 
         # Filtrar todas las trazas
-        # self.traces = self.filter_traces_highpass()
+        self.traces = self.filter_traces_highpass()
 
         # Reordenar a 6000 muestras
         self.traces = self.traces.reshape(-1, 6000)

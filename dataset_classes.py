@@ -198,7 +198,6 @@ class DatasetBelgica(Dsets):
         # Dataset de ruido
         print(f"Reading dataset from path: {self.dataset_path}")
         self.traces = sio.loadmat(self.dataset_path)["Data_2D"]
-        self.traces = self.traces.reshape(-1, 6000)
 
         # Filtrar todas las trazas
         self.traces = self.filter_traces_highpass()

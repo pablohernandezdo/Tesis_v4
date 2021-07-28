@@ -7,7 +7,7 @@ python train_til_batch.py \
         --device 3 \
         --epochs 30 \
         --batch_size 256 \
-        --final_batch 1260 \
+        --final_batch 820 \
         --earlystop 0 \
         --eval_iter 30 \
         --model_folder 'modelos_batches'  \
@@ -24,7 +24,7 @@ python train_til_batch.py \
         --device 3 \
         --epochs 30 \
         --batch_size 256 \
-        --final_batch 10140 \
+        --final_batch 7719 \
         --earlystop 0 \
         --eval_iter 30 \
         --model_folder 'modelos_batches'  \
@@ -41,7 +41,7 @@ python train_til_batch.py \
         --device 3 \
         --epochs 30 \
         --batch_size 256 \
-        --final_batch 7740 \
+        --final_batch 8338 \
         --earlystop 0 \
         --eval_iter 30 \
         --model_folder 'modelos_batches'  \

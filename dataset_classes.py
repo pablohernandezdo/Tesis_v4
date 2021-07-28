@@ -200,7 +200,7 @@ class DatasetBelgica(Dsets):
         self.traces = sio.loadmat(self.dataset_path)["Data_2D"]
 
         # Filtrar todas las trazas
-        self.traces = self.filter_traces_highpass()
+        # self.traces = self.filter_traces_highpass(self.traces)
 
         # Reordenar a 6000 muestras
         self.traces = self.traces.reshape(-1, 6000)
@@ -241,14 +241,16 @@ class DatasetBelgica(Dsets):
 
         # Retornar solo las necesarias
         self.preprocessed_traces = self.preprocessed_traces[:n_traces]
+
+        self.preprocessed_traces = self.filter_traces_highpass(self.preprocessed_traces)
         
         print(f"Saving npy format dataset in {self.savepath}")
         self.save_dataset(self.preprocessed_traces, self.savepath, 'Belgica')
 
-    def filter_traces_highpass(self, lowcut=2, order=5):
+    def filter_traces_highpass(self, traces, lowcut=3, order=5):
         traces_filt = []
 
-        for tr in self.traces:
+        for tr in traces:
             tr = self.butter_highpass_filter(tr, lowcut, self.fs, order=order)
             traces_filt.append(tr)
 

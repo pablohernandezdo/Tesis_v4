@@ -205,6 +205,9 @@ class DatasetBelgica(Dsets):
         # Reordenar a 6000 muestras
         self.traces = self.traces.reshape(-1, 6000)
 
+        # Filtrar trazas cortas
+        self.traces = self.filter_traces_highpass(self.traces)
+
         # ventanas en tiempo
         nsta = 20 * self.fs
         nlta = 100 * self.fs
@@ -242,8 +245,6 @@ class DatasetBelgica(Dsets):
         # Retornar solo las necesarias
         self.preprocessed_traces = self.preprocessed_traces[:n_traces]
 
-        self.preprocessed_traces = self.filter_traces_highpass(self.preprocessed_traces)
-        
         print(f"Saving npy format dataset in {self.savepath}")
         self.save_dataset(self.preprocessed_traces, self.savepath, 'Belgica')
 

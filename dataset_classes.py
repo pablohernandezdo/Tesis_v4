@@ -71,6 +71,14 @@ class Dsets:
         return y
 
     @staticmethod
+    def butter_highpass_filter(dat, lowcut, fs, order=5):
+        nyq = 0.5 * fs
+        low = lowcut / nyq
+        b, a = butter(order, low, btype='high', output='ba')
+        y = lfilter(b, a, dat)
+        return y
+
+    @staticmethod
     def read_segy(dataset_path):
         with segyio.open(dataset_path, ignore_geometry=True) as segy:
             # Memory map, faster
@@ -112,7 +120,8 @@ class DatasetFrancia(Dsets):
         self.traces_nonzero = self.elim_zeros()
 
         print(f"Saving npy format dataset without zeros in {self.savepath}")
-        self.save_dataset(self.traces_nonzero, self.savepath, 'Francia_no_zeros')
+        self.save_dataset(self.traces_nonzero,
+                          self.savepath, 'Francia_no_zeros')
 
     def elim_zeros(self):
         new_traces = []
@@ -186,32 +195,82 @@ class DatasetBelgica(Dsets):
         self.fs = 10
         self.n_traces = n_traces
 
-        # Dataset de ruido, no es necesario preprocesar
+        # Dataset de ruido
         print(f"Reading dataset from path: {self.dataset_path}")
         self.traces = sio.loadmat(self.dataset_path)["Data_2D"]
         self.traces = self.traces.reshape(-1, 6000)
 
-        # self.noise_traces = []
+        # Filtrar todas las trazas
+        self.traces = self.filter_traces_highpass()
+
+        # Reordenar a 6000 muestras
+        self.traces = self.traces.reshape(-1, 6000)
 
         # ventanas en tiempo
         nsta = 20 * self.fs
         nlta = 100 * self.fs
 
         self.cfts = []
+        self.preprocessed_traces = []
 
         for tr in self.traces:
+
+            # Eliminar tendencia lineal
+            tr = detrend(tr)
+
+            # Eliminar valor medio
+            tr -= np.mean(tr)
+
+            # Normalizar
+            if np.amax(np.abs(tr)):
+                tr /= np.amax(np.abs(tr))
+
+            # STA / LTA
             cft = classic_sta_lta(tr, nsta, nlta)
+
             self.cfts.append(cft)
+            self.preprocessed_traces.append(tr)
 
         # Resultados STA/LTA
         self.cfts = np.asarray(self.cfts)
+        self.preprocessed_traces = np.asarray(self.preprocessed_traces)
+
+        # Ordenar por maximo STA/LTA
+        idxs = np.argsort(np.max(self.cfts, axis=1))
+        self.traces = self.traces[idxs, :]
+        self.preprocessed_traces = self.preprocessed_traces[idxs, :]
+
+        # Retornar solo las necesarias
+        self.preprocessed_traces = self.preprocessed_traces[:n_traces]
+
+        # Ordenar por maximo STA/LTA
+        idxs = np.argsort(np.max(cfts, axis=1))
+        self.traces = self.traces[idxs, :]
 
         # Ordenar por maximo STA/LTA
         idxs = np.argsort(np.max(cfts, axis=1))
         self.traces = self.traces[idxs, :]
         
         print(f"Saving npy format dataset in {self.savepath}")
-        self.save_dataset(self.traces, self.savepath, 'Belgica')
+        self.save_dataset(self.preprocessed_traces, self.savepath, 'Belgica')
+
+    def filter_traces_highpass(self, lowcut=3, order=5):
+        traces_filt = []
+
+        for tr in self.traces:
+            tr = self.butter_highpass_filter(tr, lowcut, self.fs, order=order)
+            traces_filt.append(tr)
+
+        return np.asarray(traces_filt)
+
+    def filter_traces_highpass(self, lowcut=3, order=5):
+        traces_filt = []
+
+        for tr in self.traces:
+            tr = self.butter_highpass_filter(tr, lowcut, self.fs, order=order)
+            traces_filt.append(tr)
+
+        return np.asarray(traces_filt)
 
 
 class DatasetReykjanes(Dsets):
@@ -606,7 +665,8 @@ class DatasetCoompana(Dsets):
 
         print(f"Saving npy format dataset in {self.savepath}")
         if not os.path.exists(f'{self.savepath}/Coompana.npy'):
-            self.save_dataset(self.traces[:18000, :], self.savepath, 'Coompana')
+            self.save_dataset(
+                self.traces[:18000, :], self.savepath, 'Coompana')
 
     def padd(self):
 
@@ -718,5 +778,5 @@ class DatasetNCAirgun(Dsets):
 
         print(f"Saving npy format dataset in {self.savepath}")
         if not os.path.exists(f'{self.savepath}/NCAirgun.npy'):
-            self.save_dataset(self.traces[:18000, :], self.savepath, 'NCAirgun')
-
+            self.save_dataset(
+                self.traces[:18000, :], self.savepath, 'NCAirgun')

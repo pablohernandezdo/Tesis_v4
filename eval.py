@@ -10,7 +10,6 @@ from torch.utils.data import DataLoader
 from humanfriendly import format_timespan
 
 from models import *
-from dataset import NpyDataset
 
 
 def main():
@@ -30,19 +29,14 @@ def main():
                         help="Choose classifier architecture")
     parser.add_argument("--test_path", default='Test_data_v2.hdf5',
                         help="HDF5 test Dataset path")
+    parser.add_argument("--device", type=int, default=3,
+                        help="Training gpu device")
     parser.add_argument("--batch_size", type=int, default=256,
                         help="Size of the training batches")
     args = parser.parse_args()
 
     # Select training device
-    device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
-
-    # Test dataset
-    test_set = NpyDataset(args.test_path)
-    test_loader = DataLoader(test_set,
-                             batch_size=args.batch_size,
-                             shuffle=True,
-                             num_workers=8)
+    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
 
     # Load specified Classifier
     net = get_classifier(args.classifier)
@@ -51,13 +45,16 @@ def main():
     # Count number of parameters
     params = count_parameters(net)
 
+    # Load npy data
+    dset_npy = np.load(args.test_path)
+
     # Load from trained model
     net.load_state_dict(torch.load(f'{args.model_folder}/'
                                    f'{args.model_name}.pth'))
     net.eval()
 
     # Evaluate model on test set
-    evaluate_dataset(test_loader, args.dataset_name + '/Test',
+    evaluate_dataset(dset_npy, args.dataset_name + '/Test',
                      device, net, args.model_name,
                      args.model_folder,
                      'Net_outputs')
@@ -65,30 +62,36 @@ def main():
     eval_end = time.time()
     total_time = eval_end - start_time
 
-    print(f'Total evaluation time: {format_timespan(total_time)}\n\n'
-          f'Number of network parameters: {params}')
+    print(f'Classifier: {args.classifier}\n'
+          f'Number of network parameters: {params}\n'
+          f'Total evaluation time: {format_timespan(total_time)}')
 
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def evaluate_dataset(data_loader, dataset_name, device, net,
+def evaluate_dataset(dset_npy, dataset_name, device, net,
                      model_name, model_folder, csv_folder):
 
     # List of outputs and labels used to create pd dataframe
     dataframe_rows_list = []
 
-    with tqdm.tqdm(total=len(data_loader),
+    with tqdm.tqdm(total=len(dset_npy),
                    desc=f'{dataset_name} dataset evaluation') as data_bar:
 
         with torch.no_grad():
-            for data in data_loader:
+            for data in dset_npy:
 
-                traces, labels = data[0].to(device), data[1].to(device)
-                outputs = net(traces)
+                trace = data[:6000].astype(np.float32)
+                label = np.array([data[-1]]).astype(np.float32)
 
-                for out, lab in zip(outputs, labels):
+                trace = torch.from_numpy(trace).to(device)
+                label = torch.from_numpy(label).to(device)
+
+                outputs = net(trace)
+
+                for out, lab in zip(outputs, label):
                     new_row = {'out': out.item(),
                                'label': int(lab.item())}
                     dataframe_rows_list.append(new_row)

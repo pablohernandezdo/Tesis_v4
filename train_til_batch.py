@@ -44,6 +44,8 @@ def main():
                         help="Dataloader num workers")
     parser.add_argument("--batch_size", type=int, default=256,
                         help="Size of the batches")
+    parser.add_argument("--final_batch", type=int, default=1e7,
+                        help="Batch that finishes training")
     parser.add_argument("--eval_iter", type=int, default=1,
                         help="Number of batches between validations")
     parser.add_argument("--earlystop", type=int, default=1,
@@ -91,8 +93,8 @@ def main():
 
     # Train model
     train_model(train_loader, args.dataset_name, val_loader, net,
-                device, args.epochs, optimizer, criterion,
-                args.earlystop, args.patience, args.eval_iter,
+                device, args.epochs, args.final_batch, optimizer,
+                criterion, args.earlystop, args.patience, args.eval_iter,
                 f'{args.model_folder}', args.model_name)
 
     # Measure training, and execution times
@@ -108,7 +110,7 @@ def main():
 
 
 def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
-                optimizer, criterion, earlystop, patience,
+                final_batch, optimizer, criterion, earlystop, patience,
                 eval_iter, model_folder, model_name):
 
     # Training and validation errors
@@ -119,11 +121,10 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     tr_losses = []
     val_losses = []
 
-    # Early stopping counter
-    early_counter = 0
-    current_best_acc = 0
     best_n_batches = 0
     total_batches = 0
+
+    finish_training = False
 
     with tqdm.tqdm(total=epochs, desc='Epochs', position=0) as epoch_bar:
         for epoch in range(epochs):
@@ -131,8 +132,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
             # Number of correctly classfied training examples
             n_total, n_correct = 0, 0
 
-            # Early stopping
-            if early_counter >= patience and epoch > 0 and earlystop:
+            if finish_training:
                 break
 
             with tqdm.tqdm(total=len(train_loader),
@@ -214,25 +214,11 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     total_batches += 1
                     batch_bar.update()
 
-                    # Check if performance increased
-                    if val_acc > current_best_acc:
-                        # earlystop counter 0
-                        early_counter = 0
-
-                        # guardar checkpoint
+                    # If reaches final batch
+                    if total_batches == final_batch:
                         best_model_params = net.state_dict()
-
-                        # guardar mejor numero de batches
                         best_n_batches = total_batches
-
-                        # actualizar current_best_acc
-                        current_best_acc = val_acc
-
-                    else:
-                        early_counter += 1
-
-                    # Early stopping
-                    if early_counter >= patience and epoch > 0 and earlystop:
+                        finish_training = True
                         break
 
                 epoch_bar.update()
@@ -243,7 +229,6 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     else:
         model_dirname = ""
 
-    # EVAL ITER VA A TENER QUE SER SIEMPRE 1
     # Save train and validation accuracies/losses to csv
     os.makedirs(f'LearningCurves/{dataset_name}/', exist_ok=True)
 

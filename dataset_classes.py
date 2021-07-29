@@ -298,6 +298,10 @@ class DatasetBelgica(Dsets):
             cfts.append(cft)
             preprocessed_traces.append(tr)
 
+        # Np array
+        cfts = np.asarray(cfts)
+        preprocessed_traces = np.asarray(preprocessed_traces)
+        
         # Ordenar por maximo STA/LTA
         idxs = np.argsort(np.max(cfts, axis=1))
         preprocessed_traces = preprocessed_traces[idxs, :]

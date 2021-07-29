@@ -17,6 +17,20 @@ class ANN(nn.Module):
         wave = self.l3(wave)
         return self.sigmoid(wave)
 
+class ANN2(nn.Module):
+    def __init__(self):
+        super(ANN2, self).__init__()
+
+        self.l1 = nn.Linear(6000, 6000)
+        self.l2 = nn.Linear(6000, 3000)
+        self.l3 = nn.Linear(3000, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, wave):
+        wave = F.relu(self.l1(wave))
+        wave = F.relu(self.l2(wave))
+        wave = self.l3(wave)
+        return self.sigmoid(wave)
 
 class CNN(nn.Module):
     def __init__(self):

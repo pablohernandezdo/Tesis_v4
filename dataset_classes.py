@@ -25,9 +25,12 @@ class Dsets:
 
         for trace in traces:
 
-            if fs / 2 < 50:
-                # Filter 50 Hz
-                trace = self.butter_lowpass_filter(trace, 50, fs)
+            # if fs / 2 < 50:
+            #    # Filter 50 Hz
+            #    trace = self.butter_lowpass_filter(trace, 50, fs)
+
+            # Filtrar con pasabanda
+            trace = self.butter_bandpass_filter(trace, 1, 45, fs)
 
             # Detrending
             trace = detrend(trace)
@@ -76,6 +79,15 @@ class Dsets:
         low = lowcut / nyq
         b, a = butter(order, low, btype='high', output='ba')
         y = lfilter(b, a, dat)
+        return y
+
+    @staticmethod
+    def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+        nyq = 0.5 * fs
+        low = lowcut / nyq
+        high = highcut / nyq
+        b, a = butter(order, [low, high], btype='band')
+        y = lfilter(b, a, data)
         return y
 
     @staticmethod
@@ -199,24 +211,77 @@ class DatasetBelgica(Dsets):
         print(f"Reading dataset from path: {self.dataset_path}")
         self.traces = sio.loadmat(self.dataset_path)["Data_2D"]
 
-        # Filtrar todas las trazas
-        self.traces = self.filter_traces_highpass(self.traces)
+        # Remuestrear a 100 Hz
+        self.resampled_traces = self.resample_traces()
+
+        # Filtrar trazas sin remuestrear y remuestreadas
+        self.traces = self.filter_non_resampled_traces(self.traces)
+        self.resampled_traces = self.filter_resampled_traces(self.resampled_traces)
 
         # Reordenar a 6000 muestras
         self.traces = self.traces.reshape(-1, 6000)
+        self.resampled_traces = self.resampled_traces.reshape(-1, 6000)
 
-        # Filtrar trazas cortas
-        # self.traces = self.filter_traces_highpass(self.traces)
-
-        # ventanas en tiempo
+        # STA/LTA
         nsta = 20 * self.fs
         nlta = 100 * self.fs
 
-        self.cfts = []
-        self.preprocessed_traces = []
+        nsta_resampled = 2 * 100
+        nlta_resampled = 10 * 100
+
+        # Ordenar por umbral maximo STA/LTA.
+        # A las remuestreadas le paso solo 50000 si no se demora mucho
+        self.traces = self.preprocess_order_by_stalta(nsta, nlta, self.traces)
+        self.resampled_traces = self.preprocess_order_by_stalta(nsta_resampled,
+                                                                nlta_resampled,
+                                                                self.resampled_traces[:50000])
+
+        # Retornar solo las necesarias
+        self.traces = self.traces[:n_traces]
+        self.preprocessed_traces = self.preprocessed_traces[:n_traces]
+
+        # Guardar datasets preprocesados
+        print(f"Saving npy format dataset in {self.savepath}")
+        self.save_dataset(self.traces, self.savepath, 'Belgica')
+
+        print(f"Saving npy format dataset in {self.savepath}")
+        self.save_dataset(self.resampled_traces, self.savepath, 'Belgica_resampled')
+
+    def resample_traces(self):
+        resampled = []
 
         for tr in self.traces:
+            tr = signal.resample(tr, 420000)
+            resampled.append(tr)
 
+        return np.asarray(resampled)
+
+    def filter_resampled_traces(self, traces, lowcut=1, highcut=45, fs=100, order=5):
+        filtered = []
+
+        for tr in traces:
+            tr = self.butter_bandpass_filter(
+                tr, lowcut, highcut, fs, order=order)
+            filtered.append(tr)
+
+        return np.asarray(filtered)
+
+    def filter_non_resampled_traces(self, traces, lowcut=1, highcut=4, fs=10, order=5):
+        filtered = []
+
+        for tr in traces:
+            tr = self.butter_bandpass_filter(
+                tr, lowcut, highcut, fs, order=order)
+            filtered.append(tr)
+
+        return np.asarray(filtered)
+
+    @staticmethod
+    def preprocess_order_by_stalta(nsta, nlta, traces):
+        cfts = []
+        preprocessed_traces = []
+
+        for tr in traces:
             # Eliminar tendencia lineal
             tr = detrend(tr)
 
@@ -230,32 +295,14 @@ class DatasetBelgica(Dsets):
             # STA / LTA
             cft = classic_sta_lta(tr, nsta, nlta)
 
-            self.cfts.append(cft)
-            self.preprocessed_traces.append(tr)
-
-        # Resultados STA/LTA
-        self.cfts = np.asarray(self.cfts)
-        self.preprocessed_traces = np.asarray(self.preprocessed_traces)
+            cfts.append(cft)
+            preprocessed_traces.append(tr)
 
         # Ordenar por maximo STA/LTA
-        idxs = np.argsort(np.max(self.cfts, axis=1))
-        self.traces = self.traces[idxs, :]
-        self.preprocessed_traces = self.preprocessed_traces[idxs, :]
+        idxs = np.argsort(np.max(cfts, axis=1))
+        preprocessed_traces = preprocessed_traces[idxs, :]
 
-        # Retornar solo las necesarias
-        self.preprocessed_traces = self.preprocessed_traces[:n_traces]
-
-        print(f"Saving npy format dataset in {self.savepath}")
-        self.save_dataset(self.preprocessed_traces, self.savepath, 'Belgica')
-
-    def filter_traces_highpass(self, traces, lowcut=2, order=5):
-        traces_filt = []
-
-        for tr in traces:
-            tr = self.butter_highpass_filter(tr, lowcut, self.fs, order=order)
-            traces_filt.append(tr)
-
-        return np.asarray(traces_filt)
+        return preprocessed_traces
 
 
 class DatasetReykjanes(Dsets):

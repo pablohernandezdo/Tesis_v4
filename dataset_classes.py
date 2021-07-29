@@ -238,7 +238,7 @@ class DatasetBelgica(Dsets):
 
         # Retornar solo las necesarias
         self.traces = self.traces[:n_traces]
-        self.preprocessed_traces = self.preprocessed_traces[:n_traces]
+        self.resampled_traces = self.resampled_traces[:n_traces]
 
         # Guardar datasets preprocesados
         print(f"Saving npy format dataset in {self.savepath}")
@@ -301,7 +301,7 @@ class DatasetBelgica(Dsets):
         # Np array
         cfts = np.asarray(cfts)
         preprocessed_traces = np.asarray(preprocessed_traces)
-        
+
         # Ordenar por maximo STA/LTA
         idxs = np.argsort(np.max(cfts, axis=1))
         preprocessed_traces = preprocessed_traces[idxs, :]

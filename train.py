@@ -243,43 +243,43 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                         tr_fscores.append(train_fscore)
                         val_fscores.append(val_fscore)
 
-                        # Update number of batches
-                        total_batches += 1
-                        batch_bar.update()
+                    # Update number of batches
+                    total_batches += 1
+                    batch_bar.update()
 
-                        # # Check if performance increased
-                        # if val_acc > current_best_acc:
-                        #     # earlystop counter 0
-                        #     early_counter = 0
+                    # # Check if performance increased
+                    # if val_acc > current_best_acc:
+                    #     # earlystop counter 0
+                    #     early_counter = 0
 
-                        #     # guardar checkpoint
-                        #     best_model_params = net.state_dict()
+                    #     # guardar checkpoint
+                    #     best_model_params = net.state_dict()
 
-                        #     # guardar mejor numero de batches
-                        #     best_n_batches = total_batches
+                    #     # guardar mejor numero de batches
+                    #     best_n_batches = total_batches
 
-                        #     # actualizar current_best_acc
-                        #     current_best_acc = val_acc
+                    #     # actualizar current_best_acc
+                    #     current_best_acc = val_acc
 
-                        # else:
-                        #     early_counter += 1
+                    # else:
+                    #     early_counter += 1
 
-                        # Check if performance increased
-                        if val_fscore > current_best_fscore:
-                            # earlystop counter 0
-                            early_counter = 0
+                    # Check if performance increased
+                    if val_fscore > current_best_fscore:
+                        # earlystop counter 0
+                        early_counter = 0
 
-                            # guardar checkpoint
-                            best_model_params = net.state_dict()
+                        # guardar checkpoint
+                        best_model_params = net.state_dict()
 
-                            # guardar mejor numero de batches
-                            best_n_batches = total_batches
+                        # guardar mejor numero de batches
+                        best_n_batches = total_batches
 
-                            # actualizar current_best_fscore
-                            current_best_fscore = val_fscore
+                        # actualizar current_best_fscore
+                        current_best_fscore = val_fscore
 
-                        else:
-                            early_counter += 1
+                    else:
+                        early_counter += 1
 
                     # Early stopping
                     if early_counter >= patience and epoch > 0 and earlystop:

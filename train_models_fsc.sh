@@ -5,10 +5,10 @@ echo "Training model Ann_6k_3k, lr = 1e-5, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-5 \
         --device 3 \
-        --epochs 10 \
+        --epochs 5 \
         --batch_size 256 \
         --earlystop 0 \
-        --eval_iter 30 \
+        --eval_iter 10 \
         --model_folder 'models'  \
         --classifier ANN \
         --model_name ANN_6k_3k_1e5_256_fsc \
@@ -23,10 +23,10 @@ echo "Training model Cnn, lr = 1e-3, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-3 \
         --device 3 \
-        --epochs 10 \
+        --epochs 5 \
         --batch_size 256 \
         --earlystop 0 \
-        --eval_iter 30 \
+        --eval_iter 10 \
         --model_folder 'models'  \
         --classifier CNN \
         --model_name CNN_1e3_256_fsc \
@@ -41,10 +41,10 @@ echo "Training model CRED, lr = 1e-3, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-3 \
         --device 3 \
-        --epochs 10 \
+        --epochs 5 \
         --batch_size 256 \
         --earlystop 0 \
-        --eval_iter 30 \
+        --eval_iter 10 \
         --model_folder 'models'  \
         --classifier CRED \
         --model_name CRED_1e3_256_fsc \

@@ -225,23 +225,23 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                         # Loss promedio en el dataset de validacion
                         val_avg_loss = total_val_loss / len(val_loader)
 
-                        # Calculate validation accuracy
-                        # val_acc = 100 * correct_val / total_val
+                    # Calculate validation accuracy
+                    # val_acc = 100 * correct_val / total_val
 
-                        # Calcular validation fscore
-                        val_fscore = (2 * val_tps) / ( 2* val_tps + val_fns + val_fps)
+                    # Calcular validation fscore
+                    val_fscore = (2 * val_tps) / ( 2* val_tps + val_fns + val_fps)
 
-                        # Save loss to list
-                        val_losses.append(val_avg_loss)
-                        tr_losses.append(loss.cpu().detach().numpy())
+                    # Save loss to list
+                    val_losses.append(val_avg_loss)
+                    tr_losses.append(loss.cpu().detach().numpy())
 
-                        # Append training and validation accuracies
-                        # tr_accuracies.append(train_acc)
-                        # val_accuracies.append(val_acc)
-                        
-                        # Append training and validation fscores
-                        tr_fscores.append(train_fscore)
-                        val_fscores.append(val_fscore)
+                    # Append training and validation accuracies
+                    # tr_accuracies.append(train_acc)
+                    # val_accuracies.append(val_acc)
+                    
+                    # Append training and validation fscores
+                    tr_fscores.append(train_fscore)
+                    val_fscores.append(val_fscore)
 
                     # Update number of batches
                     total_batches += 1

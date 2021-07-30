@@ -175,7 +175,7 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     optimizer.step()
 
                     # Check validation accuracy periodically
-                    if i % eval_iter == 0:
+                    if total_batches % eval_iter == 0:
                         # Switch model to eval mode
                         net.eval()
 
@@ -231,55 +231,55 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                         # Calcular validation fscore
                         val_fscore = (2 * val_tps) / ( 2* val_tps + val_fns + val_fps)
 
-                    # Save loss to list
-                    val_losses.append(val_avg_loss)
-                    tr_losses.append(loss.cpu().detach().numpy())
+                        # Save loss to list
+                        val_losses.append(val_avg_loss)
+                        tr_losses.append(loss.cpu().detach().numpy())
 
-                    # Append training and validation accuracies
-                    # tr_accuracies.append(train_acc)
-                    # val_accuracies.append(val_acc)
-                    
-                    # Append training and validation fscores
-                    tr_fscores.append(train_fscore)
-                    val_fscores.append(val_fscore)
+                        # Append training and validation accuracies
+                        # tr_accuracies.append(train_acc)
+                        # val_accuracies.append(val_acc)
+                        
+                        # Append training and validation fscores
+                        tr_fscores.append(train_fscore)
+                        val_fscores.append(val_fscore)
 
-                    # Update number of batches
-                    total_batches += 1
-                    batch_bar.update()
+                        # Update number of batches
+                        total_batches += 1
+                        batch_bar.update()
 
-                    # # Check if performance increased
-                    # if val_acc > current_best_acc:
-                    #     # earlystop counter 0
-                    #     early_counter = 0
+                        # # Check if performance increased
+                        # if val_acc > current_best_acc:
+                        #     # earlystop counter 0
+                        #     early_counter = 0
 
-                    #     # guardar checkpoint
-                    #     best_model_params = net.state_dict()
+                        #     # guardar checkpoint
+                        #     best_model_params = net.state_dict()
 
-                    #     # guardar mejor numero de batches
-                    #     best_n_batches = total_batches
+                        #     # guardar mejor numero de batches
+                        #     best_n_batches = total_batches
 
-                    #     # actualizar current_best_acc
-                    #     current_best_acc = val_acc
+                        #     # actualizar current_best_acc
+                        #     current_best_acc = val_acc
 
-                    # else:
-                    #     early_counter += 1
+                        # else:
+                        #     early_counter += 1
 
-                    # Check if performance increased
-                    if val_fscore > current_best_fscore:
-                        # earlystop counter 0
-                        early_counter = 0
+                        # Check if performance increased
+                        if val_fscore > current_best_fscore:
+                            # earlystop counter 0
+                            early_counter = 0
 
-                        # guardar checkpoint
-                        best_model_params = net.state_dict()
+                            # guardar checkpoint
+                            best_model_params = net.state_dict()
 
-                        # guardar mejor numero de batches
-                        best_n_batches = total_batches
+                            # guardar mejor numero de batches
+                            best_n_batches = total_batches
 
-                        # actualizar current_best_fscore
-                        current_best_fscore = val_fscore
+                            # actualizar current_best_fscore
+                            current_best_fscore = val_fscore
 
-                    else:
-                        early_counter += 1
+                        else:
+                            early_counter += 1
 
                     # Early stopping
                     if early_counter >= patience and epoch > 0 and earlystop:

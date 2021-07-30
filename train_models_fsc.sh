@@ -5,7 +5,7 @@ echo "Training model Ann_6k_3k, lr = 1e-5, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-5 \
         --device 3 \
-        --epochs 30 \
+        --epochs 10 \
         --batch_size 256 \
         --earlystop 0 \
         --eval_iter 30 \
@@ -23,7 +23,7 @@ echo "Training model Cnn, lr = 1e-3, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-3 \
         --device 3 \
-        --epochs 30 \
+        --epochs 10 \
         --batch_size 256 \
         --earlystop 0 \
         --eval_iter 30 \
@@ -41,7 +41,7 @@ echo "Training model CRED, lr = 1e-3, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-3 \
         --device 3 \
-        --epochs 30 \
+        --epochs 10 \
         --batch_size 256 \
         --earlystop 0 \
         --eval_iter 30 \

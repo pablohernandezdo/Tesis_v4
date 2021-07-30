@@ -19,7 +19,7 @@ python train.py \
 P1=$!
 
 # CNN
-echo "Training model Cnn2, lr = 1e-3, epochs = 30, batch_size = 256"
+echo "Training model Cnn, lr = 1e-3, epochs = 30, batch_size = 256"
 python train.py \
         --lr 1e-3 \
         --device 3 \

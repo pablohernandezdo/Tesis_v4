@@ -4,7 +4,7 @@
 echo "Training model Ann_6k_6k, lr = 1e-6, epochs = 200, batch_size = 256"
 python train_fsc.py \
         --lr 1e-6 \
-        --device 3 \
+        --device 2 \
         --epochs 200 \
         --batch_size 256 \
         --earlystop 0 \
@@ -22,7 +22,7 @@ P1=$!
 echo "Training model Cnn1, lr = 1e-5, epochs = 200, batch_size = 256"
 python train_fsc.py \
         --lr 1e-5 \
-        --device 3 \
+        --device 2 \
         --epochs 200 \
         --batch_size 256 \
         --earlystop 0 \
@@ -40,7 +40,7 @@ P2=$!
 echo "Training model CRED, lr = 1e-5 epochs = 200, batch_size = 256"
 python train_fsc.py \
         --lr 1e-5 \
-        --device 3 \
+        --device 2 \
         --epochs 200 \
         --batch_size 256 \
         --earlystop 0 \

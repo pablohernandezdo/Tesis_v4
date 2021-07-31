@@ -7,8 +7,8 @@ class ANN(nn.Module):
         super(ANN, self).__init__()
 
         self.l1 = nn.Linear(6000, 6000)
-        self.l2 = nn.Linear(6000, 3000)
-        self.l3 = nn.Linear(3000, 1)
+        self.l2 = nn.Linear(6000, 6000)
+        self.l3 = nn.Linear(6000, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, wave):

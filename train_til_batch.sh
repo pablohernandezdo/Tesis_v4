@@ -46,7 +46,7 @@ python train_til_batch.py \
         --eval_iter 30 \
         --model_folder 'modelos_batches'  \
         --classifier CRED \
-        --model_name CRED_1e3_256_batch_30000 \
+        --model_name CRED_1e5_256_batch_30000 \
         --dataset_name "STEAD-ZEROS" \
         --train_path "Data/TrainReady/train_zeros.npy" \
         --val_path "Data/TrainReady/val_zeros.npy" 

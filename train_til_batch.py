@@ -114,8 +114,12 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                 eval_iter, model_folder, model_name):
 
     # Training and validation errors
-    tr_accuracies = []
-    val_accuracies = []
+    # tr_accuracies = []
+    # val_accuracies = []
+
+    # Training and validation fscores
+    tr_fscores = []
+    val_fscores = []
 
     # Training and validation losses
     tr_losses = []
@@ -152,9 +156,13 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     pred = torch.round(outputs)
 
                     # Calculate accuracy on current batch
-                    n_total += labels.size(0)
-                    n_correct += (pred == labels).sum().item()
-                    train_acc = 100 * n_correct / n_total
+                    # n_total += labels.size(0)
+                    # n_correct += (pred == labels).sum().item()
+                    # train_acc = 100 * n_correct / n_total
+
+                    # Calculate fscore on current batch
+                    train_tp, train_fp, train_tn, train_fn = confusion(pred, labels)
+                    train_fscore = (2 * train_tp) / ( 2* train_tp + train_fn + train_fp)
 
                     # Calculate loss
                     loss = criterion(outputs, labels.float())
@@ -166,13 +174,22 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                     optimizer.step()
 
                     # Check validation accuracy periodically
-                    if i % eval_iter == 0:
+                    if total_batches % eval_iter == 0:
                         # Switch model to eval mode
                         net.eval()
 
                         # Calculate accuracy on validation
+                        # total_val_loss = 0
+                        # total_val, correct_val = 0, 0
+
+                        # Calculate fscore on validation
+                        val_tps = 0
+                        val_tns = 0
+                        val_fps = 0
+                        val_fns = 0
+
+                        # Calculate loss on validation
                         total_val_loss = 0
-                        total_val, correct_val = 0, 0
 
                         with torch.no_grad():
                             for val_data in val_loader:
@@ -193,22 +210,37 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                                 # pred labels
                                 pred = torch.round(outputs)
 
-                                # Sum up correct and total validation examples
-                                total_val += labels.size(0)
-                                correct_val += (pred == labels).sum().item()
+                                # Calcular casos de prediccion
+                                tp, fp, tn, fn = confusion(pred, labels)
+                                val_tps += tp
+                                val_tns += tn
+                                val_fps += fp
+                                val_fns += fn
 
+                                # Sum up correct and total validation examples
+                                # total_val += labels.size(0)
+                                # correct_val += (pred == labels).sum().item()
+
+                            # Loss promedio en el dataset de validacion
                             val_avg_loss = total_val_loss / len(val_loader)
 
-                        # Calculate validation accuracy
-                        val_acc = 100 * correct_val / total_val
+                    # Calculate validation accuracy
+                    # val_acc = 100 * correct_val / total_val
+
+                    # Calcular validation fscore
+                    val_fscore = (2 * val_tps) / ( 2* val_tps + val_fns + val_fps)
 
                     # Save loss to list
                     val_losses.append(val_avg_loss)
                     tr_losses.append(loss.cpu().detach().numpy())
 
                     # Append training and validation accuracies
-                    tr_accuracies.append(train_acc)
-                    val_accuracies.append(val_acc)
+                    # tr_accuracies.append(train_acc)
+                    # val_accuracies.append(val_acc)
+
+                    # Append training and validation fscores
+                    tr_fscores.append(train_fscore)
+                    val_fscores.append(val_fscore)
 
                     # Update number of batches
                     total_batches += 1
@@ -232,18 +264,27 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
     # Save train and validation accuracies/losses to csv
     os.makedirs(f'LearningCurves/{dataset_name}/', exist_ok=True)
 
-    pd_train_acc = pd.DataFrame({'TrainAcc': tr_accuracies})
+    # pd_train_acc = pd.DataFrame({'TrainAcc': tr_accuracies})
+    pd_train_fscore = pd.DataFrame({'TrainFsc': tr_fscores})
     pd_train_loss = pd.DataFrame({'TrainLoss': tr_losses})
 
-    pd_val_acc = pd.DataFrame({'ValAcc': val_accuracies})
+    # pd_val_acc = pd.DataFrame({'ValAcc': val_accuracies})
+    pd_val_fscore = pd.DataFrame({'ValFsc': val_fscores})
     pd_val_loss = pd.DataFrame({'ValLoss': val_losses})
 
-    best_n_batches = [best_n_batches] * len(tr_accuracies)
+    # best_n_batches = [best_n_batches] * len(tr_accuracies)
+    best_n_batches = [best_n_batches] * len(tr_fscores)
     pd_n_batches = pd.DataFrame({'Train_batches': best_n_batches})
 
-    pd_data = pd.concat([pd_train_acc,
+    # pd_data = pd.concat([pd_train_acc,
+    #                     pd_train_loss,
+    #                     pd_val_acc,
+    #                     pd_val_loss,
+    #                     pd_n_batches], axis=1)
+
+    pd_data = pd.concat([pd_train_fscore,
                          pd_train_loss,
-                         pd_val_acc,
+                         pd_val_fscore,
                          pd_val_loss,
                          pd_n_batches], axis=1)
 
@@ -251,10 +292,16 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                    f'{model_name}.csv', index=False)
 
     # Plot train and validation accuracies
-    learning_curve_acc(tr_accuracies, val_accuracies,
-                       f'Figures/Learning_curves/{dataset_name}/'
-                       f'Accuracy/{model_dirname}',
-                       model_name, best_n_batches[0])
+    # learning_curve_acc(tr_accuracies, val_accuracies,
+    #                   f'Figures/Learning_curves/{dataset_name}/'
+    #                   f'Accuracy/{model_dirname}',
+    #                   model_name, best_n_batches[0])
+
+    # Plot train and validation fscores
+    learning_curve_fscore(tr_fscores, val_fscores,
+                          f'Figures/Learning_curves/{dataset_name}/'
+                          f'Fscore/{model_dirname}',
+                          model_name, best_n_batches[0])
 
     # Plot train and validation losses
     learning_curve_loss(tr_losses, val_losses,
@@ -269,24 +316,65 @@ def train_model(train_loader, dataset_name, val_loader, net, device, epochs,
                f'{model_folder.split("/")[-1]}/{model_name}.pth')
 
 
-def learning_curve_acc(tr_acc, val_acc, savepath,
-                       model_name, n_batch):
+def confusion(prediction, truth):
+    """ Returns the confusion matrix for the values in the `prediction` and `truth`
+    tensors, i.e. the amount of positions where the values of `prediction`
+    and `truth` are
+    - 1 and 1 (True Positive)
+    - 1 and 0 (False Positive)
+    - 0 and 0 (True Negative)
+    - 0 and 1 (False Negative)
+    """
+
+    confusion_vector = prediction / truth
+    # Element-wise division of the 2 tensors returns a new tensor which holds a
+    # unique value for each case:
+    #   1     where prediction and truth are 1 (True Positive)
+    #   inf   where prediction is 1 and truth is 0 (False Positive)
+    #   nan   where prediction and truth are 0 (True Negative)
+    #   0     where prediction is 0 and truth is 1 (False Negative)
+
+    true_positives = torch.sum(confusion_vector == 1).item()
+    false_positives = torch.sum(confusion_vector == float('inf')).item()
+    true_negatives = torch.sum(torch.isnan(confusion_vector)).item()
+    false_negatives = torch.sum(confusion_vector == 0).item()
+
+    return true_positives, false_positives, true_negatives, false_negatives
+
+# def learning_curve_acc(tr_acc, val_acc, savepath,
+#                        model_name, n_batch):
+
+#     if not os.path.exists(savepath):
+#         os.makedirs(savepath, exist_ok=True)
+
+#     plt.figure(figsize=(20, 20))
+#     line_tr, = plt.plot(tr_acc, label='Training accuracy')
+#     line_val, = plt.plot(val_acc, label='Validation accuracy')
+#     plt.axvline(n_batch, label='')
+#     plt.grid(True)
+#     plt.xlabel('Batches')
+#     plt.ylabel('Accuracy')
+#     plt.title(f'Accuracy learning curve model {model_name}')
+#     plt.legend(handles=[line_tr, line_val], loc='best')
+#     plt.savefig(f'{savepath}/{model_name}_accuracies.png')
+
+def learning_curve_fscore(tr_fscore, val_fscore, savepath,
+                          model_name, n_batch):
 
     if not os.path.exists(savepath):
         os.makedirs(savepath, exist_ok=True)
 
     plt.figure(figsize=(20, 20))
-    line_tr, = plt.plot(tr_acc, label='Training accuracy')
-    line_val, = plt.plot(val_acc, label='Validation accuracy')
+    line_tr, = plt.plot(tr_fscore, label='Training Fscore')
+    line_val, = plt.plot(val_fscore, label='Validation Fscore')
     plt.axvline(n_batch, label='')
     plt.grid(True)
     plt.xlabel('Batches')
-    plt.ylabel('Accuracy')
-    plt.title(f'Accuracy learning curve model {model_name}')
+    plt.ylabel('Fscore')
+    plt.title(f'Fscore learning curve model {model_name}')
     plt.legend(handles=[line_tr, line_val], loc='best')
-    plt.savefig(f'{savepath}/{model_name}_accuracies.png')
-
-
+    plt.savefig(f'{savepath}/{model_name}_fscores.png')
+    
 def learning_curve_loss(tr_loss, val_loss, savepath,
                         model_name, n_batch):
 
